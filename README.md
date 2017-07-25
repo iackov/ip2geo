@@ -80,6 +80,16 @@ geo $tz_mm {
     default "UTC+3";
     include geo/mm_tz.txt;
 }
+
+geo $lattitude {
+    ranges;
+    include geo/lattitude.txt;
+}
+
+geo $longitude {
+    ranges;
+    include geo/longitude.txt;
+}
 ```
 
 Таким образом, IP адреса в файлах записаны в виде диапазона (range) и отсортированы по возрастанию IP. Карты сделаны каскадно, чтобы решить проблему пересечений диапазонов. IPGeobase используется в первую очередь, и если адрес там не найден, то MaxMind.
