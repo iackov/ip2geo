@@ -83,7 +83,7 @@ geo $tz_mm {
 
 geo $lattitude {
     ranges;
-    include geo/lattitude.txt;
+    include geo/latitude.txt;
 }
 
 geo $longitude {
