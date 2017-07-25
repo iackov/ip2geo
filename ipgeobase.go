@@ -173,7 +173,7 @@ func ipgeobaseWriteMap(outputDir string, database map[string]City) error {
 	if err != nil {
 		return err
 	}
-	lat, err := openMapFile(outputDir, "lattitude.txt")
+	lat, err := openMapFile(outputDir, "latitude.txt")
 	if err != nil {
 		return err
 	}
