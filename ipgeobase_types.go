@@ -5,4 +5,6 @@ type City struct {
 	Name  string
 	RegID int
 	TZ    string
+	LAT   string
+	LON   string
 }

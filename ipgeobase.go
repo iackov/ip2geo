@@ -7,11 +7,12 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"golang.org/x/net/html/charset"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"sort"
+
+	"golang.org/x/net/html/charset"
 )
 
 func ipgeobaseGenerate(outputDir string, errors_chan chan Error) {
@@ -120,7 +121,7 @@ func ipgeobaseCities(archive []*zip.File) (map[string]City, error) {
 			continue
 		}
 		// Format is:  <city_id>\t<city_name>\t<region>\t<district>\t<lattitude>\t<longitude>
-		cid, city, regionName := record[0], record[1], record[2]
+		cid, city, regionName, lattitude, longitude := record[0], record[1], record[2], record[4], record[5]
 		if region, ok := REGIONS[regionName]; ok {
 			if cid == "1199" {
 				region, _ = REGIONS["Москва"]
@@ -129,6 +130,8 @@ func ipgeobaseCities(archive []*zip.File) (map[string]City, error) {
 				Name:  city,
 				RegID: region.ID,
 				TZ:    region.TZ,
+				LAT:   lattitude,
+				LON:   longitude,
 			}
 		}
 	}
@@ -170,9 +173,20 @@ func ipgeobaseWriteMap(outputDir string, database map[string]City) error {
 	if err != nil {
 		return err
 	}
+	lat, err := openMapFile(outputDir, "lattitude.txt")
+	if err != nil {
+		return err
+	}
+	lon, err := openMapFile(outputDir, "longitude.txt")
+	if err != nil {
+		return err
+	}
 	defer reg.Close()
 	defer city.Close()
 	defer tz.Close()
+	defer lat.Close()
+	defer lon.Close()
+
 	ipRanges := make(IPList, len(database))
 	i := 0
 	for ipRange := range database {
@@ -185,6 +199,8 @@ func ipgeobaseWriteMap(outputDir string, database map[string]City) error {
 		fmt.Fprintf(city, "%s %s;\n", ipRange, base64.StdEncoding.EncodeToString([]byte(info.Name)))
 		fmt.Fprintf(reg, "%s %02d;\n", ipRange, info.RegID)
 		fmt.Fprintf(tz, "%s %s;\n", ipRange, info.TZ)
+		fmt.Fprintf(lat, "%s %s;\n", ipRange, info.LAT)
+		fmt.Fprintf(lon, "%s %s;\n", ipRange, info.LON)
 	}
 	return nil
 }
